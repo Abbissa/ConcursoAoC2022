@@ -208,7 +208,6 @@ public class Dia12 {
 
         @Override
         protected Object clone() throws CloneNotSupportedException {
-            // TODO Auto-generated method stub
             return super.clone();
         }
 
