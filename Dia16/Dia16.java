@@ -69,24 +69,11 @@ public class Dia16 {
                 if (i == Aid && valves[j].flowRate != 0
                         || (valves[i].flowRate != 0 && valves[j].flowRate != 0 && i != j))
                     continue;
-                // if (valves[i].flowRate == 0 || valves[j].flowRate == 0 || i == j) {
                 conexiones[i][j] = 30;
 
             }
         }
-        // System.out.print(" ");
-        // for (int i = 0; i < conexiones.length; i++) {
-        // System.out.print(i + " ");
-        // }
-        // System.out.println();
-        // System.out.println();
-        // for (int i = 0; i < conexiones.length; i++) {
-        // System.out.print(i + " ");
-        // for (int j = 0; j < conexiones.length; j++) {
-        // System.out.print(conexiones[i][j] + " ");
-        // }
-        // System.out.println();
-        // }
+        
 
         return conexiones;
 
@@ -180,66 +167,7 @@ public class Dia16 {
         return max;
 
     }
-    // private static int solve(HashMap<String, Valve> mapa, int time) {
-
-    // time--;
-    // Path[][] caminos = new Path[mapa.size()][30];
-    // for (String valve : mapa.get("AA").leadTo) {
-    // ArrayList<String> a = new ArrayList<>();
-    // a.add("AA");
-    // caminos[mapa.get(valve).id][0] = new Path(0, new HashSet<>(), a);
-    // }
-    // for (int i = time; i > 0; i--) {
-    // System.out.println();
-    // System.out.println("Minutos restantes: " + i);
-    // System.out.println();
-
-    // for (int j = 0; j < caminos.length; j++) {
-    // Path p = caminos[j][time - i];
-    // if (p == null)
-    // continue;
-    // Valve valve = valves[j];
-
-    // System.out.println("Name: " + valve.name);
-    // System.out.println("Preasure: " + p.pressureReleased);
-    // p.camino.add(valve.name);
-
-    // if (!p.valvesActivated.contains(valve.name) && valve.flowRate > 0
-    // && (caminos[valve.id][time - i + 1] == null || p.pressureReleased
-    // + valve.flowRate * (i - 1) > caminos[valve.id][time - i +
-    // 1].pressureReleased)) {
-    // p.valvesActivated.add(valve.name);
-    // p.pressureReleased += valve.flowRate * (i - 1);
-    // caminos[valve.id][time - i + 1] = new Path(p.pressureReleased,
-    // p.valvesActivated, p.camino);
-    // p.pressureReleased -= valve.flowRate * (i - 1);
-    // p.valvesActivated.remove(valve.name);
-    // }
-
-    // for (int j2 = 0; j2 < valve.leadTo.size(); j2++) {
-
-    // int idTo = mapa.get(valve.leadTo.get(j2)).id;
-    // if (caminos[idTo][time - i + 1] == null
-    // || caminos[idTo][time - i + 1].pressureReleased <= p.pressureReleased)
-    // caminos[idTo][time - i + 1] = new Path(p.pressureReleased, p.valvesActivated,
-    // p.camino);
-    // }
-
-    // }
-    // }
-
-    // int max = 0;
-    // for (int j = 1; j < caminos.length; j++) {
-    // if (caminos[j][caminos[j].length
-    // - 1].pressureReleased > (caminos[max][caminos[max].length -
-    // 1].pressureReleased))
-    // max = j;
-
-    // }
-
-    // System.out.println(caminos[max][caminos[max].length - 1].camino);
-    // return caminos[max][caminos[max].length - 1].pressureReleased;
-    // }
+    
 
     private static HashMap<String, Valve> leer(String file) throws FileNotFoundException {
         HashMap<String, Valve> mapa = new HashMap<>();
