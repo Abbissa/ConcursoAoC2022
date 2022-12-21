@@ -35,19 +35,22 @@ public class Dia19 {
         System.out.println("Lectura: " + ((double) (aux - init)) / 1000_000 + " ms");
         init = aux;
 
-        parte1(blueprints);
+        parte1(blueprints, 24);
 
         aux = System.nanoTime();
         System.out.println("Parte 1 ejemplo: " + ((double) (aux - init)) / 1000_000_000 + " s");
         init = aux;
 
+        parte2(blueprints, 32);
+        aux = System.nanoTime();
+        System.out.println("Parte 2(32) ejemplo: " + ((double) (aux - init)) / 1000_000_000 + " s");
 
         blueprints = leer(INPUT);
 
-        parte1(blueprints);
+        parte1(blueprints, 24);
         aux = System.nanoTime();
-        System.out.println("Parte 1 input: " + ((double)(aux - init))/ 1000_000_000+"s");
-        init=aux;
+        System.out.println("Parte 1 input: " + ((double) (aux - init)) / 1000_000_000 + "s");
+        init = aux;
 
         parte2(blueprints, 32);
         aux = System.nanoTime();
@@ -58,15 +61,15 @@ public class Dia19 {
         int[] res = solve(blueprints, time, true);
         int result = 1;
         for (int i = 0; i < 3 && i < res.length; i++) {
-            System.out.println(i+": "+res[i]);
+            System.out.println(i + ": " + res[i]);
             result *= res[i];
         }
         System.out.println(result);
 
     }
 
-    private static void parte1(ArrayList<Blueprint> blueprints) throws FileNotFoundException {
-        int[] res = solve(blueprints, 24, false);
+    private static void parte1(ArrayList<Blueprint> blueprints, int time) throws FileNotFoundException {
+        int[] res = solve(blueprints, time, false);
         int result = 0;
         for (int i = 0; i < res.length; i++) {
             result += (i + 1) * res[i];
@@ -91,11 +94,15 @@ public class Dia19 {
         int pa = 0;
 
         for (Blueprint b : blueprints) {
-            Path p = new Path(0, 0, 0, 0, 1, 0, 0, 0, time);
+            Path p = new Path(0, 0, 0, 0, 1, 0, 0, 0, time, new boolean[4]);
             paths.add(p);
 
-            if (i == 3 && parte2)
+            if (i == 3 && parte2) {
+                System.out.println(n);
+                System.out.println(pa);
                 return max;
+
+            }
             int maxOC = Math.max(b.costeOreOreRobot, b.costeOreClayRobot);
             maxOC = Math.max(maxOC, b.costeOreGeodeRobot);
             maxOC = Math.max(maxOC, b.costeOreObsidianRobot);
@@ -103,46 +110,63 @@ public class Dia19 {
                 p = paths.poll();
                 n++;
 
-                // String key =
-                // p.clay+","+p.clayRobot+","+p.geode+","+p.geodeRobot+","+p.obsidian+","+p.obsidianRobot+","+p.ore+","+p.oreRobot+","+p.timeLeft;
                 if (p.geode + mejorCaso(p.timeLeft, p.geodeRobot) < max[i]) {
                     continue;
                 }
                 pa++;
-                // estadosComprobados.add(key);
 
                 int nOre = p.oreRobot;
                 int nClay = p.clayRobot;
                 int nObs = p.obsidianRobot;
                 int nGeode = p.geodeRobot;
 
+                boolean[] robotsNoConstruidos = new boolean[3];
+                // optimizar no avanzar al siguiente minuto, sino al minuto en el que esto pueda
+                // ser construido
                 if (p.ore >= b.costeOreGeodeRobot && p.obsidian >= b.costeObsidianGeodeRobot && p.timeLeft > 1) {
                     paths.add(new Path(p.ore + nOre - b.costeOreGeodeRobot, p.clay + nClay,
                             p.obsidian + nObs - b.costeObsidianGeodeRobot, p.geode + nGeode, p.oreRobot,
-                            p.clayRobot, p.obsidianRobot, p.geodeRobot + 1, p.timeLeft - 1));
+                            p.clayRobot, p.obsidianRobot, p.geodeRobot + 1, p.timeLeft - 1, robotsNoConstruidos));
+                    continue;
                 }
-                if (p.ore >= b.costeOreObsidianRobot && p.clay >= b.costeClayObsidianRobot && p.timeLeft > 3
+                if (!p.robotsNoConstruidos[2] && p.ore >= b.costeOreObsidianRobot && p.clay >= b.costeClayObsidianRobot
+                        && p.timeLeft > 3
                         && p.obsidianRobot < b.costeObsidianGeodeRobot) {
                     paths.add(new Path(p.ore + nOre - b.costeOreObsidianRobot,
                             p.clay + nClay - b.costeClayObsidianRobot, p.obsidian + nObs, p.geode + nGeode, p.oreRobot,
-                            p.clayRobot, p.obsidianRobot + 1, p.geodeRobot, p.timeLeft - 1));
+                            p.clayRobot, p.obsidianRobot + 1, p.geodeRobot, p.timeLeft - 1, robotsNoConstruidos));
                 }
-                if (p.ore >= b.costeOreOreRobot && p.timeLeft > 3 + b.costeOreOreRobot && p.oreRobot < maxOC) {
+                if (!p.robotsNoConstruidos[0] && p.ore >= b.costeOreOreRobot && p.timeLeft > 3 + b.costeOreOreRobot
+                        && p.oreRobot < maxOC) {
                     paths.add(new Path(p.ore + nOre - b.costeOreOreRobot, p.clay + nClay, p.obsidian + nObs,
                             p.geode + nGeode,
-                            p.oreRobot + 1, p.clayRobot, p.obsidianRobot, p.geodeRobot, p.timeLeft - 1));
+                            p.oreRobot + 1, p.clayRobot, p.obsidianRobot, p.geodeRobot, p.timeLeft - 1,
+                            robotsNoConstruidos));
                 }
-                if (p.ore >= b.costeOreClayRobot && p.timeLeft > 5 && p.clayRobot < b.costeClayObsidianRobot) {
+                if (!p.robotsNoConstruidos[1] && p.ore >= b.costeOreClayRobot && p.timeLeft > 5
+                        && p.clayRobot < b.costeClayObsidianRobot) {
                     paths.add(new Path(p.ore + nOre - b.costeOreClayRobot, p.clay + nClay, p.obsidian + nObs,
                             p.geode + nGeode, p.oreRobot,
-                            p.clayRobot + 1, p.obsidianRobot, p.geodeRobot, p.timeLeft - 1));
+                            p.clayRobot + 1, p.obsidianRobot, p.geodeRobot, p.timeLeft - 1, robotsNoConstruidos));
+                }
+                boolean[] r = new boolean[3];
+
+                if (p.ore >= b.costeOreClayRobot) {
+
+                    r[1] = true;
+                }
+                if (p.ore >= b.costeOreOreRobot) {
+                    r[0] = true;
+                }
+                if (p.ore >= b.costeOreObsidianRobot && p.clay >= b.costeClayObsidianRobot) {
+                    r[2] = true;
                 }
 
                 p.ore += nOre;
                 p.clay += nClay;
                 p.obsidian += nObs;
                 p.geode += nGeode;
-
+                p.robotsNoConstruidos = r;
                 max[i] = Math.max(max[i], p.geode);
                 p.timeLeft--;
                 if (p.timeLeft > 0)
@@ -234,6 +258,7 @@ public class Dia19 {
 
     private static class Path {
 
+        public boolean[] robotsNoConstruidos;
         int ore;
         int clay;
         int obsidian;
@@ -246,7 +271,7 @@ public class Dia19 {
         int timeLeft;
 
         public Path(int ore, int clay, int obsidian, int geode, int oreRobot, int clayRobot, int obsidianRobot,
-                int geodeRobot, int timeLeft) {
+                int geodeRobot, int timeLeft, boolean[] robotsNoConstruidos) {
             this.ore = ore;
             this.clay = clay;
             this.obsidian = obsidian;
@@ -256,6 +281,7 @@ public class Dia19 {
             this.obsidianRobot = obsidianRobot;
             this.geodeRobot = geodeRobot;
             this.timeLeft = timeLeft;
+            this.robotsNoConstruidos = robotsNoConstruidos;
         }
 
     }
