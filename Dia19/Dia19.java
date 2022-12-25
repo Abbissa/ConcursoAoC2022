@@ -15,18 +15,16 @@ public class Dia19 {
     private static String EXAMPLE = "Dia19\\example.txt";
     private static String INPUT = "Dia19\\input.txt";
 
-    private static HashMap<Integer, HashMap<Integer, Integer>> mejoresCasos;
+    private static HashMap<Integer, Integer> mejoresCasos;
 
     public static void main(String[] args) throws FileNotFoundException {
         long init = System.nanoTime();
         mejoresCasos = new HashMap<>();
-        for (int i = 1; i < 32; i++) {
-            mejoresCasos.put(i, new HashMap<>());
-            for (int j = 0; j < 10; j++) {
-                mejoresCasos.get(i).put(j, mejorCaso(i, j));
-            }
 
+        for (int j = 0; j < 50; j++) {
+            mejoresCasos.put(j, mejorCaso(j));
         }
+
         long aux = System.nanoTime();
         System.out.println("Calculos: " + ((double) (aux - init)) / 1000_000 + " ms");
         init = aux;
@@ -41,7 +39,7 @@ public class Dia19 {
         System.out.println("Parte 1 ejemplo: " + ((double) (aux - init)) / 1000_000_000 + " s");
         init = aux;
 
-        parte2(blueprints, 32);
+        parte2(blueprints, 25);
         aux = System.nanoTime();
         System.out.println("Parte 2(32) ejemplo: " + ((double) (aux - init)) / 1000_000_000 + " s");
 
@@ -88,6 +86,7 @@ public class Dia19 {
             }
 
         });
+
         int i = 0;
         int max[] = new int[blueprints.size()];
         int n = 0;
@@ -109,8 +108,9 @@ public class Dia19 {
             while (!paths.isEmpty()) {
                 p = paths.poll();
                 n++;
+                max[i] = Math.max(max[i], p.geode);
 
-                if (p.geode + mejorCaso(p.timeLeft, p.geodeRobot) < max[i]) {
+                if (p.geode + mejorCaso(p.timeLeft) <= max[i]) {
                     continue;
                 }
                 pa++;
@@ -123,30 +123,113 @@ public class Dia19 {
                 boolean[] robotsNoConstruidos = new boolean[3];
                 // optimizar no avanzar al siguiente minuto, sino al minuto en el que esto pueda
                 // ser construido
-                if (p.ore >= b.costeOreGeodeRobot && p.obsidian >= b.costeObsidianGeodeRobot && p.timeLeft > 1) {
+                // if (p.ore + p.oreRobot * (p.timeLeft - 1) >= b.costeOreGeodeRobot
+                // && p.obsidian + p.obsidianRobot * (p.timeLeft - 1) >=
+                // b.costeObsidianGeodeRobot) {
+
+                // int tiempo = (int) Math
+                // .ceil(Math.max(((double) (b.costeObsidianGeodeRobot - p.obsidian)) /
+                // p.obsidianRobot,
+                // ((double) (b.costeOreGeodeRobot - p.ore)) / p.oreRobot));
+
+                // tiempo = Math.max(1, tiempo);
+
+                // paths.add(new Path(p.ore + nOre * tiempo - b.costeOreGeodeRobot, p.clay +
+                // nClay * tiempo,
+                // p.obsidian + nObs * tiempo - b.costeObsidianGeodeRobot,
+                // p.geode + p.timeLeft - tiempo - 1,
+                // p.oreRobot,
+                // p.clayRobot, p.obsidianRobot, p.geodeRobot, p.timeLeft - tiempo,
+                // robotsNoConstruidos));
+
+                // }
+
+                if (p.ore >= b.costeOreGeodeRobot && p.obsidian >= b.costeObsidianGeodeRobot) {
                     paths.add(new Path(p.ore + nOre - b.costeOreGeodeRobot, p.clay + nClay,
-                            p.obsidian + nObs - b.costeObsidianGeodeRobot, p.geode + nGeode, p.oreRobot,
-                            p.clayRobot, p.obsidianRobot, p.geodeRobot + 1, p.timeLeft - 1, robotsNoConstruidos));
+                            p.obsidian + nObs - b.costeObsidianGeodeRobot, p.geode + p.timeLeft - 1,
+                            p.oreRobot,
+                            p.clayRobot, p.obsidianRobot, p.geodeRobot, p.timeLeft - 1,
+                            robotsNoConstruidos));
                     continue;
                 }
-                if (!p.robotsNoConstruidos[2] && p.ore >= b.costeOreObsidianRobot && p.clay >= b.costeClayObsidianRobot
-                        && p.timeLeft > 3
-                        && p.obsidianRobot < b.costeObsidianGeodeRobot) {
-                    paths.add(new Path(p.ore + nOre - b.costeOreObsidianRobot,
-                            p.clay + nClay - b.costeClayObsidianRobot, p.obsidian + nObs, p.geode + nGeode, p.oreRobot,
-                            p.clayRobot, p.obsidianRobot + 1, p.geodeRobot, p.timeLeft - 1, robotsNoConstruidos));
+
+                // if (p.ore + p.oreRobot * (p.timeLeft - 1) >= b.costeOreObsidianRobot
+                //         && p.clay + p.clayRobot * (p.timeLeft - 1) >= b.costeClayObsidianRobot
+                //         && p.obsidianRobot < b.costeObsidianGeodeRobot) {
+
+                //     int tiempo = (int) Math
+                //             .ceil(Math.max(((double) (b.costeOreObsidianRobot - p.ore)) / p.oreRobot,
+                //                     ((double) (b.costeClayObsidianRobot - p.clay)) / p.clayRobot));
+
+                //     tiempo = Math.max(1, tiempo + 1);
+
+                //     paths.add(new Path(p.ore + nOre * tiempo - b.costeOreObsidianRobot,
+                //             p.clay + nClay * tiempo - b.costeClayObsidianRobot,
+                //             p.obsidian + nObs * tiempo,
+                //             p.geode,
+                //             p.oreRobot,
+                //             p.clayRobot, p.obsidianRobot + 1, p.geodeRobot, p.timeLeft - tiempo,
+                //             robotsNoConstruidos));
+
+                // }
+                if (!p.robotsNoConstruidos[2] && p.ore >= b.costeOreObsidianRobot && p.clay
+                >= b.costeClayObsidianRobot
+                && p.timeLeft > 3
+                && p.obsidianRobot < b.costeObsidianGeodeRobot) {
+                paths.add(new Path(p.ore + nOre - b.costeOreObsidianRobot,
+                p.clay + nClay - b.costeClayObsidianRobot, p.obsidian + nObs, p.geode,
+                p.oreRobot,
+                p.clayRobot, p.obsidianRobot + 1, p.geodeRobot, p.timeLeft - 1,
+                robotsNoConstruidos));
                 }
-                if (!p.robotsNoConstruidos[0] && p.ore >= b.costeOreOreRobot && p.timeLeft > 3 + b.costeOreOreRobot
-                        && p.oreRobot < maxOC) {
-                    paths.add(new Path(p.ore + nOre - b.costeOreOreRobot, p.clay + nClay, p.obsidian + nObs,
-                            p.geode + nGeode,
-                            p.oreRobot + 1, p.clayRobot, p.obsidianRobot, p.geodeRobot, p.timeLeft - 1,
-                            robotsNoConstruidos));
+
+                // if (p.ore + p.oreRobot * (p.timeLeft - 1) >= b.costeOreOreRobot
+                //         && p.oreRobot < maxOC) {
+
+                //     int tiempo = (int) Math.ceil((double) (b.costeOreOreRobot - p.ore) / p.oreRobot);
+
+                //     tiempo = Math.max(1, tiempo + 1);
+
+                //     paths.add(new Path(p.ore + nOre * tiempo - b.costeOreOreRobot,
+                //             p.clay + nClay * tiempo,
+                //             p.obsidian + nObs * tiempo,
+                //             p.geode,
+                //             p.oreRobot + 1,
+                //             p.clayRobot, p.obsidianRobot, p.geodeRobot, p.timeLeft - tiempo,
+                //             robotsNoConstruidos));
+
+                // }
+                if (!p.robotsNoConstruidos[0] && p.ore >= b.costeOreOreRobot && p.timeLeft >
+                3 + b.costeOreOreRobot
+                && p.oreRobot < maxOC) {
+                paths.add(new Path(p.ore + nOre - b.costeOreOreRobot, p.clay + nClay,
+                p.obsidian + nObs,
+                p.geode,
+                p.oreRobot + 1, p.clayRobot, p.obsidianRobot, p.geodeRobot, p.timeLeft - 1,
+                robotsNoConstruidos));
                 }
+
+                // if (p.ore + p.oreRobot * (p.timeLeft - 1) >= b.costeOreClayRobot
+                //         && p.clayRobot < b.costeClayObsidianRobot) {
+
+                //     int tiempo = (int) Math.ceil((double) (b.costeOreClayRobot - p.ore) / p.oreRobot);
+
+                //     tiempo = Math.max(1, tiempo + 1);
+
+                //     paths.add(new Path(p.ore + nOre * tiempo - b.costeOreClayRobot,
+                //             p.clay + nClay * tiempo,
+                //             p.obsidian + nObs * tiempo,
+                //             p.geode,
+                //             p.oreRobot,
+                //             p.clayRobot+1, p.obsidianRobot, p.geodeRobot, p.timeLeft - tiempo,
+                //             robotsNoConstruidos));
+
+                // }
+                max[i] = Math.max(max[i], p.geode);
                 if (!p.robotsNoConstruidos[1] && p.ore >= b.costeOreClayRobot && p.timeLeft > 5
                         && p.clayRobot < b.costeClayObsidianRobot) {
                     paths.add(new Path(p.ore + nOre - b.costeOreClayRobot, p.clay + nClay, p.obsidian + nObs,
-                            p.geode + nGeode, p.oreRobot,
+                            p.geode, p.oreRobot,
                             p.clayRobot + 1, p.obsidianRobot, p.geodeRobot, p.timeLeft - 1, robotsNoConstruidos));
                 }
                 boolean[] r = new boolean[3];
@@ -165,7 +248,6 @@ public class Dia19 {
                 p.ore += nOre;
                 p.clay += nClay;
                 p.obsidian += nObs;
-                p.geode += nGeode;
                 p.robotsNoConstruidos = r;
                 max[i] = Math.max(max[i], p.geode);
                 p.timeLeft--;
@@ -181,13 +263,9 @@ public class Dia19 {
 
     }
 
-    private static int mejorCaso(int timeLeft, int GR) {
+    private static int mejorCaso(int timeLeft) {
         int res = 0;
-        if (GR != 0)
-            for (int i = 0; i < timeLeft; i++) {
-                res += (timeLeft - i) * GR;
 
-            }
         for (int i = 1; i < timeLeft; i++) {
             res += i;
 

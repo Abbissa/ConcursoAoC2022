@@ -186,9 +186,9 @@ public class Dia09 {
         return res;
     }
 
-    public static class CustomPair {
-        private int key;
-        private int value;
+    public static class CustomPair implements Cloneable{
+        public int key;
+        public int value;
 
         public CustomPair(int key, int value) {
             this.key = key;
@@ -217,6 +217,11 @@ public class Dia09 {
             if (value != other.value)
                 return false;
             return true;
+        }
+        @Override
+        public CustomPair clone() throws CloneNotSupportedException {
+            
+            return new CustomPair(key, value);
         }
 
     }
